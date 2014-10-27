@@ -1,0 +1,198 @@
+CREATE SCHEMA IF NOT EXISTS `DEPORTEEXTREMO` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci ;
+USE `DEPORTEEXTREMO` ;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`EMPRESA`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`EMPRESA` (
+  `ID` INT NOT NULL ,
+  `NIT` VARCHAR(45) NOT NULL ,
+  `DESCRIPTION` VARCHAR(100) NOT NULL ,
+  PRIMARY KEY (`ID`) ,
+  UNIQUE INDEX `NIT_UNIQUE` (`NIT` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`DEPARTAMENTO`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`DEPARTAMENTO` (
+  `ID` INT NOT NULL ,
+  `DESCRIPCION` VARCHAR(100) NOT NULL ,
+  PRIMARY KEY (`ID`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`CIUDAD`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`CIUDAD` (
+  `ID` INT NOT NULL ,
+  `DESCRIPCION` VARCHAR(100) NOT NULL ,
+  `DEPARTAMENTO_ID` INT NOT NULL ,
+  PRIMARY KEY (`ID`, `DEPARTAMENTO_ID`) ,
+  INDEX `fk_CIUDAD_DEPARTAMENTO` (`DEPARTAMENTO_ID` ASC) ,
+  CONSTRAINT `fk_CIUDAD_DEPARTAMENTO`
+    FOREIGN KEY (`DEPARTAMENTO_ID` )
+    REFERENCES `DEPORTEEXTREMO`.`DEPARTAMENTO` (`ID` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`DIRECCION`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`DIRECCION` (
+  `ID` INT NOT NULL ,
+  `DESCRIPCION` VARCHAR(45) NULL ,
+  `CIUDAD_ID` INT NOT NULL ,
+  `EMAIL` VARCHAR(45) NULL ,
+  PRIMARY KEY (`ID`) ,
+  INDEX `fk_DIRECCION_CIUDAD1` (`CIUDAD_ID` ASC) ,
+  CONSTRAINT `fk_DIRECCION_CIUDAD1`
+    FOREIGN KEY (`CIUDAD_ID` )
+    REFERENCES `DEPORTEEXTREMO`.`CIUDAD` (`ID` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`DIRECCION_EMPRESA`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`DIRECCION_EMPRESA` (
+  `DIRECCION_ID` INT NOT NULL,
+  `EMPRESA_ID` INT NOT NULL, 
+  PRIMARY KEY (`DIRECCION_ID`, `EMPRESA_ID`) ,
+  CONSTRAINT `FK_DIRECCION_ID1`
+    FOREIGN KEY (`DIRECCION_ID`)
+    REFERENCES `DEPORTEEXTREMO`.`DIRECCION` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `FK_DIRECCION_EMPRESA_ID`
+    FOREIGN KEY (`EMPRESA_ID`)
+    REFERENCES `DEPORTEEXTREMO`.`EMPRESA` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`TELEFONO`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`TELEFONO` (
+  `ID` INT NOT NULL ,
+  `DIRECCION_ID` INT NOT NULL ,
+  `NUMERO_TELEFONO` VARCHAR(45) NOT NULL ,
+  `DIRECCION_ID1` INT NOT NULL ,
+  PRIMARY KEY (`ID`, `DIRECCION_ID`) ,
+  INDEX `fk_TELEFONO_DIRECCION1` (`DIRECCION_ID1` ASC) ,
+  CONSTRAINT `fk_TELEFONO_DIRECCION1`
+    FOREIGN KEY (`DIRECCION_ID1` )
+    REFERENCES `DEPORTEEXTREMO`.`DIRECCION` (`ID` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`DEPORTE`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`DEPORTE` (
+  `ID` INT NOT NULL ,
+  `DESCRIPCION` VARCHAR(45) NULL ,
+  PRIMARY KEY (`ID`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`EMPRESA_DEPORTE`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`EMPRESA_DEPORTE` (
+  `DEPORTE_ID` INT NOT NULL,
+  `EMPRESA_ID` INT NOT NULL,
+  `PRECIO_FIN_SEMANA` INT NOT NULL ,
+  `PRECIO_DIA_HABIL` VARCHAR(45) NULL ,
+
+  PRIMARY KEY (`DEPORTE_ID`,`EMPRESA_ID`) ,
+  CONSTRAINT `FK_DEPORTE_ID`
+    FOREIGN KEY (`DEPORTE_ID`)
+    REFERENCES `DEPORTEEXTREMO`.`DEPORTE` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `FK_EMPRESA_ID`
+    FOREIGN KEY (`EMPRESA_ID`)
+    REFERENCES `DEPORTEEXTREMO`.`EMPRESA` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`EMPRESA_TRANSPORTE`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`EMPRESA_TRANSPORTE` (
+  `ID` INT NOT NULL ,
+  `DESCRIPCION` VARCHAR(45) NULL ,
+  PRIMARY KEY (`ID`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`RUTAS`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`RUTAS` (
+  `CIUDAD_ORIGEN_ID` INT NOT NULL,
+  `CIUDAD_DESTINO_ID` INT NOT NULL,
+  `EMPRESA_TRANSPORTE_ID` INT NOT NULL, 
+  `PRECIO` INT NOT NULL ,
+
+  PRIMARY KEY (`CIUDAD_ORIGEN_ID`, `CIUDAD_DESTINO_ID`, `EMPRESA_TRANSPORTE_ID`) ,
+  CONSTRAINT `FK_EMPRESA_TRANSPORTE_ID`
+    FOREIGN KEY (`EMPRESA_TRANSPORTE_ID`)
+    REFERENCES `DEPORTEEXTREMO`.`EMPRESA_TRANSPORTE` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `FK_CIUDAD_ORIGEN_ID`
+    FOREIGN KEY (`CIUDAD_ORIGEN_ID`)
+    REFERENCES `DEPORTEEXTREMO`.`CIUDAD` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `FK_CIUDAD_DESTINO_ID`
+    FOREIGN KEY (`CIUDAD_DESTINO_ID`)
+    REFERENCES `DEPORTEEXTREMO`.`CIUDAD` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`ACTIVIDAD`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`ACTIVIDAD` (
+  `ID` INT NOT NULL ,
+  `DESCRIPCION` VARCHAR(45) NULL ,
+  PRIMARY KEY (`ID`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`EMPRESA_ACTIVIDAD`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `DEPORTEEXTREMO`.`EMPRESA_ACTIVIDAD` (
+  `PRECIO` INT NOT NULL ,
+  `EMPRESA_ID` INT NOT NULL ,
+  `ACTIVIDAD_ID` INT NOT NULL ,
+  PRIMARY KEY (`EMPRESA_ID`,`ACTIVIDAD_ID`) ,
+  CONSTRAINT `FK_EMPRESA_ACTIVIDAD`
+    FOREIGN KEY (`EMPRESA_ID`)
+    REFERENCES `DEPORTEEXTREMO`.`EMPRESA` (`ID`))
+
+ENGINE = InnoDB;
+
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
